@@ -1,92 +1,65 @@
-"use client"
-// components/BackgroundSwitcher.js
-import React, { useRef, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { gsap } from 'gsap';
-import * as THREE from 'three';
+"use client";
 
-const BackgroundSwitcher = () => {
-  const canvasRef = useRef(null);
-  const images = ['/background1.webp', '/background2.webp', '/background3.webp']; // Ensure correct paths
+import React, { useEffect, useRef } from "react";
+import * as THREE from "three";
 
-  const textureLoader = new THREE.TextureLoader();
-  const textures = useRef<THREE.Texture[]>(images.map(image => textureLoader.load(image)));
-
-  const planeRefs = useRef<(THREE.Mesh | null)[]>([]);
-  const addToRefs = (el: THREE.Mesh | null) => {
-    if (el && !planeRefs.current.includes(el)) {
-      planeRefs.current.push(el);
-    }
-  };
+const BackgroundSwitcher: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    planeRefs.current.forEach((plane, index) => {
-      if (plane) {
-        gsap.fromTo(plane.material, { opacity: 0 }, { opacity: index === 0 ? 1 : 0, duration: 1 });
-      }
-    });
-
-    const handleWheel = (event: WheelEvent) => {
-      event.preventDefault(); // Prevent default scrolling behavior
-
-      // Determine direction of mouse wheel
-      const delta = Math.max(-1, Math.min(1, event.deltaY));
-      let currentImage = 0;
-
-      if (delta < 0) { // Scroll up
-        currentImage = (textures.current.length + currentImage - 1) % textures.current.length;
-      } else if (delta > 0) { // Scroll down
-        currentImage = (currentImage + 1) % textures.current.length;
-      }
-
-      planeRefs.current.forEach((plane, index) => {
-        if (plane) {
-          gsap.to(plane.material, { opacity: index === currentImage ? 1 : 0, duration: 1 });
-        }
-      });
-    };
-
-    // Add wheel event listener
     const canvasElement = canvasRef.current;
     if (canvasElement) {
-      canvasElement.addEventListener('wheel', handleWheel, { passive: false });
-    }
+      const renderer = new THREE.WebGLRenderer({ canvas: canvasElement });
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const geometry = new THREE.BoxGeometry();
+      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      const cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+      camera.position.z = 5;
 
-    return () => {
-      // Clean up event listener
-      if (canvasElement) {
-        canvasElement.removeEventListener('wheel', handleWheel);
-      }
-    };
+      const animate = () => {
+        requestAnimationFrame(animate);
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+        renderer.render(scene, camera);
+      };
+      animate();
+
+      const colors = ["#000000", "#1a1a1a", "#333333"];
+      let currentIndex = 0;
+
+      const changeBackgroundColor = () => {
+        const nextIndex = (currentIndex + 1) % colors.length;
+        canvasElement.style.backgroundColor = colors[nextIndex];
+        currentIndex = nextIndex;
+      };
+
+      const interval = setInterval(changeBackgroundColor, 10000);
+
+      const handleWheel = (event: WheelEvent) => {
+        event.preventDefault();
+        if (event.deltaY > 0) {
+          camera.position.z += 1;
+        } else {
+          camera.position.z -= 1;
+        }
+      };
+
+      canvasElement.addEventListener("wheel", handleWheel, { passive: false });
+
+      return () => {
+        clearInterval(interval);
+        canvasElement.removeEventListener("wheel", handleWheel);
+      };
+    }
   }, []);
 
   return (
-    <div className="w-full h-screen fixed top-0 left-0 z-0">
-      <Canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, zIndex: -1 }}>
-        <BackgroundPlanes textures={textures.current} planeRefs={planeRefs} addToRefs={addToRefs} />
-      </Canvas>
-    </div>
-  );
-};
-
-const BackgroundPlanes = ({ textures, planeRefs, addToRefs }: { textures: THREE.Texture[], planeRefs: React.MutableRefObject<(THREE.Mesh | null)[]>, addToRefs: (el: THREE.Mesh | null) => void }) => {
-  useFrame((state) => {
-    planeRefs.current.forEach(plane => {
-      if (plane) {
-        plane.rotation.y = state.clock.elapsedTime;
-      }
-    });
-  });
-
-  return (
-    <>
-      {textures.map((texture, index) => (
-        <mesh key={index} ref={() => addToRefs(null)}>
-          <planeGeometry args={[window.innerWidth, window.innerHeight, 1, 1]} />
-          <meshBasicMaterial map={texture} transparent />
-        </mesh>
-      ))}
-    </>
+    <canvas
+      ref={canvasRef}
+      style={{ width: "100%", height: "100%", position: "fixed", top: 0, left: 0, zIndex: -1 }}
+    />
   );
 };
 
