@@ -1,5 +1,5 @@
 "use client"
-// components/CanvasBackground.tsx
+
 import React, { useEffect, useRef } from "react";
 
 const CanvasBackground: React.FC = () => {

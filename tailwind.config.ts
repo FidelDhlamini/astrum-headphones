@@ -17,4 +17,21 @@ const config: Config = {
   },
   plugins: [],
 };
+module.exports = {
+  purge: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
+  darkMode: false, 
+  theme: {
+    extend: {
+      colors: {
+        'neutral-950': '#1a1a1a',
+        'gray-950': '#1c1c1c',
+      },
+    },
+  },
+  variants: {
+    extend: {},
+  },
+  plugins: [],
+};
+
 export default config;

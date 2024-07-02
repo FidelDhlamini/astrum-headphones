@@ -1,5 +1,5 @@
 "use client"
-// components/BackgroundColorSwitcher.tsx
+
 import React, { useEffect } from "react";
 
 const BackgroundColorSwitcher: React.FC = () => {
@@ -14,7 +14,7 @@ const BackgroundColorSwitcher: React.FC = () => {
       currentIndex = nextIndex;
     };
 
-    const interval = setInterval(changeBackgroundColor, 10000); // Change every 10 seconds
+    const interval = setInterval(changeBackgroundColor, 10000);
 
     return () => clearInterval(interval);
   }, []);
