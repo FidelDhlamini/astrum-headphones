@@ -1,21 +1,24 @@
+// components/main/main/Product.tsx
+
 import React from "react";
 import ProductContent from "../sub/ProductContent";
+import Footer from "./Footer";
+import BackgroundSwitcher from "../sub/BackgroundSwitcher";
 
-const Product = () => {
-    return(
-        <div className="relative flex flex-col h-full w-full">
-        <video
-        autoPlay
-        muted
-        loop
-        className='rotate-180 absolute top-[-340px] h-full w-full left-0 z-[1]  object-cover'
-        >
-            <source src='/speakerThump.mp4' type="video/mp4"/>
+const Product: React.FC = () => {
+  return (
+    <div className="flex flex-col min-h-screen">
 
-        </video>
+
+      <div className="flex-grow relative overflow-hidden">
+        
+
         <ProductContent />
-        </div>
-    );
+      </div>
+
+      
+    </div>
+  );
 };
 
 export default Product;
