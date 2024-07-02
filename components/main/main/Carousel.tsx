@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import Slider from 'react-slick';
+import Slider, { Settings } from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import InputSlider from 'react-input-slider';
@@ -12,7 +12,7 @@ const Carousel: React.FC<CarouselProps> = ({ images }) => {
   const sliderRef = useRef<Slider>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(1);
 
-  const settings = {
+  const settings: Settings = {
     dots: true,
     infinite: true,
     speed: 500,
@@ -30,20 +30,17 @@ const Carousel: React.FC<CarouselProps> = ({ images }) => {
     ],
   };
 
-  const handleZoomChange = (position: { x: number; y: number }) => {
-    const newZoomLevel = position.x / 100 + 1; // Adjust scale based on your requirement
+  const handleZoomChange = (position: { x: number }) => {
+    const newZoomLevel = position.x / 100 + 1;
     setZoomLevel(newZoomLevel);
 
-    if (sliderRef.current) {
-      const slick = sliderRef.current.slick;
-      if (slick) {
-        slick.innerSlider.list.style.transform = `scale(${newZoomLevel})`;
-      }
+    if (sliderRef.current && sliderRef.current.innerSlider && sliderRef.current.innerSlider.list) {
+      sliderRef.current.innerSlider.list.style.transform = `scale(${newZoomLevel})`;
     }
   };
 
   return (
-    <div className="carousel-container">
+    <div className="carousel-container h-auto max-auto">
       <Slider ref={sliderRef} {...settings}>
         {images.map((image, index) => (
           <div key={index} className="image-container mx-auto">
